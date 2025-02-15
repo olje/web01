@@ -169,3 +169,34 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+.git/gws/.*aws/
+*.aws/
+*.aws/|.*aws/
+.*aws:|/
+
+# Ignore AWS credentials files
+.gits/.*aws/credentials
+.*/.aws/credentials
+.*/.aws/credentails
+.*/.aws/credentials-root
+
+# Exclude .env files and their variants
+.env
+.env.local
+config.env
+config.local.env
+.env.development
+.env.test
+
+# Ignore JSON configuration files
+*.json
+*.config.json
+
+# Exclude AWS S3 transfer command file
+.s3transfercmd.txt
+
+# Ignore temporary AWS profile files
+profile-*.txt
+
+# Exclude IAM role files and policies stored in .aws/iam/
+.*/.aws/iam/.*
