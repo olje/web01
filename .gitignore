@@ -191,6 +191,7 @@ config.local.env
 # Ignore JSON configuration files
 *.json
 *.config.json
+!template.json
 
 # Exclude AWS S3 transfer command file
 .s3transfercmd.txt
