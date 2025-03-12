@@ -1,0 +1,1 @@
+give me a python function to sort 10 numbers in a collection, the only parameter that gets that function will be a collection of only and only elements

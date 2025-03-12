@@ -1,79 +1,54 @@
 {
-    "AWSTemplateFormatVersion": "2010-09-15",
+    "AWSTemplateFormatVersion": "2010-09-09",
     "Description": "A CloudFormation template to automate purchasing and verifying a domain using Amazon Route 
-53, including VPC creation if needed.",
+53.",
     "Parameters":
     {
         "DomainName": {
             "Type": "String",
-            "Description": "The domain name to purchase and register.",
-            "MinLength": 1
+            "Required": true,
+            "Description": "The domain name to be registered."
         },
         "ContactEmail": {
             "Type": "String",
-            "Description": "The email address for domain registration contact.",
-            "Default": "your.email@example.com"
+            "DefaultValue": "your.email@example.com",
+            "Description": "The contact email for the domain registration."
         },
         "ExistingVpcId": {
             "Type": "String",
-            "Description": "The ID of an existing VPC or a new one will be created if this is not provided.",
-            "DefaultValue": ""
+            "Default": "",
+            "Description": "Optional VPC ID to use; if not provided, a new one will be created."
         }
     },
     "Resources":
     {
         "CheckAndCreateVpc": {
-            "Type": "Custom::CheckAndCreateVpc",
+            "Type": "AWS::EC2::Vpc",
             "Properties":
             {
-                "ExistingVpcId": {"Ref": "ExistingVpcId"},
-                "DomainName": {"Ref": "DomainName"},
-                "ContactEmail": {"Ref": "ContactEmail"}
+                "CidrBlock": "0.0.0.0/0"
             }
         },
         "RegisterDomain": {
             "Type": "AWS::Route53::RecordSet",
             "Properties":
             {
-                "HostedZone": {
-                    "Fn::GetAtt": ["HostedZone", "A"],
-                    "Description": "The hosted zone where the domain will be registered."
-                },
+                "HostedZoneId": { Ref: "hosted_zone" },
                 "Records": [
                     {
+                        "Name": "{ DomainName }.",
                         "Type": "A",
-                        " TTL": "60",
-                        " Records": [
-                            {
-                                "Fn::CfnRef": ["ExistingVpcId"]
-                            }
-                        ]
+                        " TTL": "60"
                     }
-                ],
-                "Comment": "Domain registration for the specified domain name."
+                ]
             }
         }
     },
     "Outputs":
     {
         "DomainRegistrationStatus": {
-            "Description": "The status of the domain registration process.",
-            "Value": {"Fn::Join": ["-", ["DomainName", "Registration Status: ", "Message"]]}
+            "Description": "The status of domain registration.",
+            "Value": "Successfully registered { DomainName } using VPC ID: { existingVpcId } or created new VPC."
         }
-    },
-    "Functions":
-    {
-        "CheckAndCreateVpc": {
-            "Description": "Function to check if VPC exists and create it if not.",
-            "Code": [
-                "def check_and_create_vpcexistingvpcid=ExistingVpcId, domainname=DomainName, 
-contactemail=ContactEmail:\n    vpcs = ec2.describe_vpcs()\n    existing_vpc = next((v for v in vpcs['vpcs'] if 
-v['vpc_id'] == existingvpcid), None)\n    if not existing_vpc:\n        create_vpc(name='new-vpc', 
-cidr_block='0.0.0.0/0')\n        print('New VPC created with ID:', create_vpc_result['vpc_id'])\n    else:\n      
-  print('Using existing VPC ID:', existingvpcid)\n    return True",
-                "Description": "Check if the specified VPC exists and create it if necessary."
-            ]
-        }
-    },
-    "Version": "1.0"
+    }
 }
